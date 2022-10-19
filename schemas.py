@@ -1,7 +1,13 @@
 from pydantic import BaseModel
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    nombre: str | None = None
+
 class UsuarioBase(BaseModel):
-    email: str
     nombre: str
 
 class UsuarioCreate(UsuarioBase):
@@ -9,6 +15,5 @@ class UsuarioCreate(UsuarioBase):
 
 class Usuario (UsuarioBase):
     id: int
-
     class Config:
         orm_mode = True
