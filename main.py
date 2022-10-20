@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 import crud, models, schemas
 from database import SessionLocal, engine
-
+from scanner import scanner
 ## Configuracion TOKEN de seguridad
 SECRET_KEY = "31406a7b32e499dd919096b267a92233f8373b1b7fa1c4485a5c0ae1ee8adedd"
 ALGORITHM = "HS256"
@@ -111,3 +111,9 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 @app.get("/usuarios/yo", response_model=schemas.Usuario)
 def get_usuario_yo(current_usuario: schemas.Usuario = Depends(get_current_usuario_activo)):
     return current_usuario
+
+@app.get("/scanner")
+def get_scanner():
+    scan = scanner()
+    scan.Cambio()
+    return {"Mensaje": "Funcionó"}
