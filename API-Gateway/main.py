@@ -98,14 +98,6 @@ def get_current_usuario(token:str = Depends(oauth2_scheme), db: Session = Depend
 def get_current_usuario_activo(current_usuario: models.Usuario = Depends(get_current_usuario)):
     return current_usuario
 
-@app.post("/usuarios", response_model=schemas.Usuario)
-def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
-    db_usuario = crud.get_usuario_by_nombre(db=db, nombre=usuario.nombre)
-    if db_usuario:
-        raise HTTPException(status_code=400, detail="Usuario existente!")
-    usuario.password = get_password_hash(usuario.password)
-    return crud.create_usuario(db, usuario=usuario)
-
 @app.post("/token", response_model=schemas.Token)
 def login_for_access_token(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
     usuario = authenticate_usuario(db, usuario.nombre, usuario.password)
@@ -122,7 +114,18 @@ def login_for_access_token(usuario: schemas.UsuarioCreate, db: Session = Depends
     )
     return {"access_token": acces_token, "token_type": "bearer"}
 
+@app.post("/usuarios", response_model=schemas.Usuario)
+def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
+    db_usuario = crud.get_usuario_by_nombre(db=db, nombre=usuario.nombre)
+    if db_usuario:
+        raise HTTPException(status_code=400, detail="Usuario existente!")
+    usuario.password = get_password_hash(usuario.password)
+    return crud.create_usuario(db, usuario=usuario)
+
+@app.get("/usuarios", response_model=schemas.Usuario)
+def get_config(current_usuario: schemas.Usuario = Depends(get_current_usuario_activo)):
+    return current_usuario
+
 @app.get("/usuarios/config", response_model=schemas.Config)
 def get_config(current_usuario: schemas.Usuario = Depends(get_current_usuario_activo)):
     return current_usuario.config
-

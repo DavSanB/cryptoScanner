@@ -28,4 +28,8 @@ class Scanner:
         mercados = mercados.sort_values(by='Cambio', ascending=False)
         mercados = mercados[mercados['Cambio']>3]
 
-        return mercados.to_json()
+        print(mercados)
+
+        merc_json = mercados.to_json(orient="split")
+        merc_json = json.loads(merc_json)
+        return json.dumps(merc_json)

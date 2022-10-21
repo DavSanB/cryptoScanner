@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordBearer
 from sse_starlette import EventSourceResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 import requests
 import asyncio
@@ -12,6 +13,19 @@ from scanner import Scanner
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 html = """
 <!DOCTYPE html>
 <html>
