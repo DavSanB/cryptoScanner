@@ -1,10 +1,15 @@
-from fastapi import FastAPI , WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse, HTMLResponse
+from fastapi import FastAPI
+from fastapi import Depends, HTTPException, status
+from fastapi.responses import HTMLResponse
+from fastapi.security import OAuth2PasswordBearer
 from sse_starlette import EventSourceResponse
-from starlette.requests import Request
+
+import requests
 import asyncio
 
 from scanner import Scanner
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
 html = """
@@ -31,6 +36,12 @@ html = """
 </html>
 """
 
+def authenticate_usuario(token: str):
+    url = 'http://localhost:8000/usuarios/config'
+    headers = {'Authorization': 'Bearer ' + token}
+    r = requests.get(url, headers=headers)
+    return r
+
 async def event_publisher():
     i = 0 
     try:
@@ -48,5 +59,18 @@ async def get():
     return HTMLResponse(html)
 
 @app.get("/endless")
-async def endless():
-    return EventSourceResponse(event_publisher())
+async def endless(token:str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="No se validaron las credenciales",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    r = authenticate_usuario(token)
+    if r.status_code == 200:
+        #return r.json()
+        return EventSourceResponse(event_publisher())
+    else:
+        raise credentials_exception
+
+    
+    

@@ -13,7 +13,14 @@ class UsuarioBase(BaseModel):
 class UsuarioCreate(UsuarioBase):
     password: str
 
+class Config (BaseModel):
+    id: int
+    title: str
+    class Config:
+        orm_mode = True
+
 class Usuario (UsuarioBase):
     id: int
+    config: Config
     class Config:
         orm_mode = True

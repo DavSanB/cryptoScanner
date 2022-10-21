@@ -15,4 +15,7 @@ def create_usuario(db:Session, usuario: schemas.UsuarioCreate):
     db.add(db_usuario)
     db.commit()
     db.refresh(db_usuario)
+    db_config = models.Config(idUsuario = db_usuario.id, title="default")
+    db.add(db_config)
+    db.commit()
     return db_usuario
