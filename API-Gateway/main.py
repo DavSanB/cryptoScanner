@@ -114,13 +114,18 @@ def login_for_access_token(usuario: schemas.UsuarioCreate, db: Session = Depends
     )
     return {"access_token": acces_token, "token_type": "bearer"}
 
-@app.post("/usuarios", response_model=schemas.Usuario)
+@app.post("/usuarios")#, response_model=schemas.Token)
 def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
     db_usuario = crud.get_usuario_by_nombre(db=db, nombre=usuario.nombre)
     if db_usuario:
         raise HTTPException(status_code=400, detail="Usuario existente!")
     usuario.password = get_password_hash(usuario.password)
-    return crud.create_usuario(db, usuario=usuario)
+    usuario = crud.create_usuario(db, usuario=usuario)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    acces_token = create_access_token(
+        data = {"sub": usuario.nombre}, expires_delta=access_token_expires
+    )
+    return {"access_token": acces_token, "token_type": "bearer"}
 
 @app.get("/usuarios", response_model=schemas.Usuario)
 def get_config(current_usuario: schemas.Usuario = Depends(get_current_usuario_activo)):
