@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 ## Imports de FastAPI 
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 ## Imports de Seguridad
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -21,6 +22,19 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Dependencia
 def get_db():
     db = SessionLocal()
@@ -93,8 +107,8 @@ def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)
     return crud.create_usuario(db, usuario=usuario)
 
 @app.post("/token", response_model=schemas.Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    usuario = authenticate_usuario(db, form_data.username, form_data.password)
+def login_for_access_token(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
+    usuario = authenticate_usuario(db, usuario.nombre, usuario.password)
     db_usuario = crud.get_usuario_by_nombre(db, nombre=usuario.nombre)
     if db_usuario is None:
         raise HTTPException(
