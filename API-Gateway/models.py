@@ -16,7 +16,9 @@ class Config(Base):
     __tablename__ = "config"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
+    monedas = Column(Integer, index=True)
+    orden =  Column(String, index=True)
+
     idUsuario = Column(Integer, ForeignKey("usuario.id"))
 
     usuario = relationship("Usuario", back_populates="config")

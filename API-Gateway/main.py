@@ -134,3 +134,8 @@ def get_config(current_usuario: schemas.Usuario = Depends(get_current_usuario_ac
 @app.get("/usuarios/config", response_model=schemas.Config)
 def get_config(current_usuario: schemas.Usuario = Depends(get_current_usuario_activo)):
     return current_usuario.config
+
+@app.put("/usuarios/config" , response_model=schemas.Config)
+def update_config(config:schemas.ConfigUpdate, db: Session = Depends(get_db), current_usuario: schemas.Usuario = Depends(get_current_usuario_activo)):
+    config = crud.update_config(db=db, usuario=current_usuario.id, config = config)
+    return config

@@ -15,7 +15,14 @@ def create_usuario(db:Session, usuario: schemas.UsuarioCreate):
     db.add(db_usuario)
     db.commit()
     db.refresh(db_usuario)
-    db_config = models.Config(idUsuario = db_usuario.id, title="default")
+    db_config = models.Config(idUsuario = db_usuario.id, monedas = 10, orden = "Cambio")
     db.add(db_config)
     db.commit()
     return db_usuario
+
+def update_config(db:Session, usuario: int, config: schemas.ConfigUpdate):
+    db_config = db.query(models.Config).filter(models.Config.idUsuario == usuario).first()
+    db_config.monedas = config.monedas
+    db_config.orden = config.orden
+    db.commit()
+    return db_config

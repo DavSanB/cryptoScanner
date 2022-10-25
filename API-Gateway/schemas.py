@@ -13,9 +13,12 @@ class UsuarioBase(BaseModel):
 class UsuarioCreate(UsuarioBase):
     password: str
 
-class Config (BaseModel):
+class ConfigUpdate (BaseModel):
+    monedas: int
+    orden: str
+    
+class Config (ConfigUpdate):
     id: int
-    title: str
     class Config:
         orm_mode = True
 
