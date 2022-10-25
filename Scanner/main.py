@@ -59,11 +59,15 @@ def authenticate_usuario(token: str):
 async def event_publisher():
     i = 0 
     try:
+        print("Cliente conectado!")
         scan = Scanner()
         while i < 10:
             i += 1
-            yield  await scan.Cambio()
-            await asyncio.sleep(5)
+            if (scan.weight == True):
+                yield  await scan.Cambio()
+            else:
+                await asyncio.sleep(60)    
+            await asyncio.sleep(3)
     except asyncio.CancelledError as e:
         print("Error, desconectando")
         raise e
@@ -81,7 +85,6 @@ async def endless(token:str = Depends(oauth2_scheme)):
     )
     r = authenticate_usuario(token)
     if r.status_code == 200:
-        #return r.json()
         return EventSourceResponse(event_publisher())
     else:
         raise credentials_exception
