@@ -19,18 +19,23 @@ class Scanner:
             print('Error')
             return {'error':''}
 
-    async def Cambio(self):
+    async def Cambio(self, config):
+
         mercado = self.GET("ticker/24hr",{})
 
         if(int(mercado.headers['x-mbx-used-weight']) < 1000):
             self.weight = True
+
             mercados = pd.DataFrame(mercado.json())
             mercados = mercados[['symbol','lastPrice','priceChangePercent','volume','count']]
             mercados.columns = ['symbol', 'Precio', 'Cambio', 'Volumen','#Trades']
             mercados = mercados.astype({'Precio':'float','Cambio':'float','Volumen':'float'})
             mercados = mercados[mercados['symbol'].str.endswith("USDT")]
-            mercados = mercados.sort_values(by='Cambio', ascending=False)
-            mercados = mercados[mercados['Cambio']>3]
+
+            mercados = mercados.sort_values(by=config['orden'], ascending=False)
+            mercados = mercados.head(config['monedas'])
+
+            #mercados = mercados[mercados['Cambio']>3]
 
             merc_json = mercados.to_json(orient="split")
             merc_json = json.loads(merc_json)
