@@ -12,7 +12,7 @@
   - Crear un usuario nuevo en PostgreSQL y darle privilegios para modificar la Base de Datos creada:
    ```
 CREATE USER cryptoscanner WITH PASSWORD 'cryptoScanner';
-GRANT ALL PRIVILEGES ON DATABASE cryptoscanner;
+GRANT ALL PRIVILEGES ON DATABASE cryptoscanner TO cryptoscanner;
  ```
   - Crear el entorno virtual para python usando:
  ```
