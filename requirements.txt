@@ -1,6 +1,7 @@
 fastapi[all]
 uvicorn[standard]
 psycopg2
+bcrypt
 jose==1.0.0
 pandas==1.5.1
 passlib==1.7.4
