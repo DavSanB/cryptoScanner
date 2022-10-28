@@ -1,6 +1,9 @@
+# IMPORTS
+
 from sqlalchemy.orm import Session
 import models, schemas
 
+# Usuario
 def get_usuario(db:Session, usuario_id: int):
     return db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()
 
@@ -20,6 +23,7 @@ def create_usuario(db:Session, usuario: schemas.UsuarioCreate):
     db.commit()
     return db_usuario
 
+# Config
 def update_config(db:Session, usuario: int, config: schemas.ConfigUpdate):
     db_config = db.query(models.Config).filter(models.Config.idUsuario == usuario).first()
     db_config.monedas = config.monedas
