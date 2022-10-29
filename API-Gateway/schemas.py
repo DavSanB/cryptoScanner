@@ -11,6 +11,16 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     nombre: str | None = None
 
+# Config 
+class ConfigUpdate (BaseModel):
+    monedas: int
+    orden: str
+    
+class Config (ConfigUpdate):
+    id: int
+    class Config:
+        orm_mode = True
+
 # Usuario
 class UsuarioBase(BaseModel):
     nombre: str
@@ -21,15 +31,5 @@ class UsuarioCreate(UsuarioBase):
 class Usuario (UsuarioBase):
     id: int
     config: Config
-    class Config:
-        orm_mode = True
-        
-# Config 
-class ConfigUpdate (BaseModel):
-    monedas: int
-    orden: str
-    
-class Config (ConfigUpdate):
-    id: int
     class Config:
         orm_mode = True

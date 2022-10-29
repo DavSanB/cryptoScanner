@@ -6,11 +6,14 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-import models, schemas
+from sqlalchemy.orm import Session
+import models, schemas, crud
+
+from datetime import datetime, timedelta
 
 class Security:
 
-    def __init__(self, credentials_exception):
+    def __init__(self):
         # Token
         self.ALGORITHM = "HS256"
         self.ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -18,35 +21,32 @@ class Security:
 
         #Encripción
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        self.oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-    def get_password_hash(password):
-        return pwd_context.hash(password)
+    def get_password_hash(self, password):
+        return self.pwd_context.hash(password)
     
-    def verify_password(plain_password, hashed_password):
-        return pwd_context.verify(plain_password, hashed_password)
+    def verify_password(self, plain_password, hashed_password):
+        return self.pwd_context.verify(plain_password, hashed_password)
 
-    def create_access_token(self, data: dict, expires_delta:timedelta | None = None):
+    def create_access_token(self, nombre):
 
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=15)
+        to_encode = {
+            "sub": nombre,
+            "exp": datetime.utcnow() + timedelta(self.ACCESS_TOKEN_EXPIRE_MINUTES)
+        }
 
-        to_encode = data.copy()
-        to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, key = self.SECRET_KEY, algorithm = self.ALGORITHM)
         
         return encoded_jwt
 
     def authenticate_usuario(self, db: Session, nombre:str, password:str):
         db_usuario = crud.get_usuario_by_nombre(db=db, nombre=nombre)
-        if not verify_password(password, db_usuario.hashed_password):
+        if not self.verify_password(password, db_usuario.hashed_password):
             return None
 
         return db_usuario
 
-    def get_current_usuario(self, db: Session, token:str = Depends(self.oauth2_scheme)):
+    def get_current_usuario(self, db: Session, token:str):
         try:
             payload = jwt.decode(token, self.SECRET_KEY, algorithms = [self.ALGORITHM])
             db_usuario = crud.get_usuario_by_nombre(db, nombre = payload.get("sub"))
