@@ -35,8 +35,6 @@ class Scanner:
             mercados = mercados.sort_values(by=config['orden'], ascending=False)
             mercados = mercados.head(config['monedas'])
 
-            #mercados = mercados[mercados['Cambio']>3]
-
             merc_json = mercados.to_json(orient="split")
             merc_json = json.loads(merc_json)
             return json.dumps(merc_json)

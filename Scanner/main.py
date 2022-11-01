@@ -1,12 +1,19 @@
+# IMPORTS
+
+## Imports de FastAPI 
 from fastapi import FastAPI
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sse_starlette import EventSourceResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-import requests
-import asyncio
+## Imports de Seguridad
+from fastapi.security import OAuth2PasswordBearer
 
+## Imports de SSE (Server-Sent Events)
+import asyncio
+import requests
+from sse_starlette import EventSourceResponse
+
+## Scanner
 from scanner import Scanner
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
